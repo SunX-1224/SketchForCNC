@@ -4,10 +4,9 @@ from utils import *
 
 class Arc:
     ID = 'arc'
-    def __init__(self, center, radius, p1, p2, sa, ea, axial_ratio=1):
+    def __init__(self, center, radius, p1, p2, sa, ea):
         self.center = center
         self.radius = radius
-        self.axial_ratio = axial_ratio
         self.start_angle =  sa
         self.end_angle = ea
         self.start_point = p1
@@ -16,18 +15,17 @@ class Arc:
     def getStatus(self):
         p1 = self.start_point
         p2 = self.end_point
-        l1 = f"Center : {self.center[0]:.2f}, {self.center[1]:.2f} Radius : {self.radius:.2f}".format(self.center, self.radius)
+        l1 = f"Center : ({self.center[0]:.2f}, {self.center[1]:.2f}) Radius : {self.radius:.2f}".format(self.center, self.radius)
         # l2 = f"sp : ({p1[0]:.2f}, {p1[1]:.2f}) ep : ({p2[0]:.2f}, {p2[1]:.2f})".format(p1, p2)
         l2 = f"sa : {int(self.start_angle*180/3.1415)} , ea = {int(self.end_angle*180/3.1415)}"
-        l3 = f"Axial ratio : {self.axial_ratio}"
-        return [l1, l2, l3]
+        return [l1, l2]
 
     def draw(self, surface, color):
         pygame.draw.circle(surface, C_REF, MM2PX(self.center), 2)
         if abs((self.end_angle-self.start_angle)%(2 * math.pi)-(2 * math.pi))<0.01:
             pygame.draw.circle(surface, color, MM2PX(self.center), self.radius/MMPPX, 1)
             return
-        rect = ((self.center[0]-self.radius)/MMPPX, (self.center[1]-self.radius)/MMPPX, 2*self.axial_ratio*self.radius/MMPPX, 2*self.radius/MMPPX)
+        rect = ((self.center[0]-self.radius)/MMPPX, (self.center[1]-self.radius)/MMPPX, 2*self.radius/MMPPX, 2*self.radius/MMPPX)
         pygame.draw.arc(surface, color, rect, self.start_angle, self.end_angle)
 
     def coincident(self, c):

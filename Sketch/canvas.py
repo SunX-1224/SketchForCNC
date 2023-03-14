@@ -61,7 +61,6 @@ class Canvas:
             pygame.draw.lines(self.WIN.window, C_HLT, False, self.__getPolygon(cursor, p1))
         elif self.WIN.mode == "arc" and len(self.temp)>1:
             arc = Arc.from3p(PX2MM(p1), PX2MM(self.absPos(self.temp[1])), PX2MM(cursor))
-            arc.axial_ratio = self.bufferNum
             arc.draw(self.WIN.window, C_HLT)
         elif self.WIN.mode == "circle":
             dl = (cursor[0] - p1[0], cursor[1] - p1[1])
@@ -76,7 +75,11 @@ class Canvas:
         cursor = PX2MM(cursor)
 
         labels.append(f"Cursor : ({cursor[0]:.2f}, {cursor[1]:.2f})".format(cursor))
-
+        if len(self.temp) > 0:
+            d = sub(cursor, PX2MM(self.temp[-1]) )
+            l = round(dist(d, (0,0)),4)
+            labels.append(f"(dx, dy) : {ROUND(d)}")
+            labels.append(f"dl : {l}")
         if self.WIN.mode == "select":
             t = None
             if self.curve !=-1:
@@ -89,16 +92,12 @@ class Canvas:
             buffer = "n_sides"
             labels.append(f"n : {self.bufferNum}")
         elif self.WIN.mode == "arc":
-            buffer = "axial ratio"
             if len(self.temp)==2:
                 arc = Arc.from3p(PX2MM(self.temp[0]), PX2MM(self.temp[1]), PX2MM(cursor))
-                arc.axial_ratio = self.bufferNum
                 labels+=arc.getStatus()
         elif self.WIN.mode == "circle":
-            buffer = "axial ratio"
             if len(self.temp)>0:
-                radius = dist(self.temp[0], cursor)
-                labels.append(f"Center : {ROUND(PX2MM(self.temp[0]))} Radius : {radius:.4f}".format(radius))
+                labels.append(f"Center : {ROUND(PX2MM(self.temp[0]))}")
         elif self.WIN.mode == "z-safe":
             buffer = "Z-safe"
             labels.append(f"Z-Safe : {self.gcode.zsafe}")
@@ -140,7 +139,6 @@ class Canvas:
         elif self.WIN.mode == "arc":
             self.temp = [PX2MM(t) for t in self.temp]
             a = Arc.from3p(*self.temp)
-            a.axial_ratio = self.bufferNum
             self.segments.append(a)
         elif self.WIN.mode == "circle":
             self.temp = [PX2MM(t) for t in self.temp]
